@@ -1,0 +1,5 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* We keep this completely empty of custom body styles so Tailwind can do its magic without interference! */
