@@ -1,24 +1,29 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Lock, Mail, Leaf, Loader2, ArrowRight } from 'lucide-react';
 
-// Added onSwitchToRegister prop to handle navigation to the registration form
-const LoginForm = ({ supabase, onSwitchToRegister }) => {
+const LoginForm = ({ supabase }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // Initialize navigate hook
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    // Supabase handles the authentication and session update automatically
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) { 
       setError(error.message); 
       setLoading(false); 
+    } else {
+      // Upon success, manually ensure we move to the overview route
+      navigate('/overview');
     }
   };
 
@@ -86,12 +91,12 @@ const LoginForm = ({ supabase, onSwitchToRegister }) => {
           </button>
         </form>
 
-        {/* Added Navigation to Registration Form */}
         <div className="mt-8 text-center">
           <p className="text-gray-500 font-medium text-sm">
             New administrator?{' '}
             <button 
-              onClick={onSwitchToRegister}
+              type="button"
+              onClick={() => navigate('/register')} // Trigger routing to /register
               className="text-emerald-600 font-bold hover:underline transition-all"
             >
               Create an Account

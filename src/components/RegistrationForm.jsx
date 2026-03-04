@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Mail, Lock, User, ArrowRight, Leaf, Loader2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
-const RegisterForm = ({ onSwitchToLogin }) => {
+const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // Initialize navigation hook
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,7 +41,7 @@ const RegisterForm = ({ onSwitchToLogin }) => {
     } else {
       // Success logic
       alert("Registration successful! Please check your email or try signing in.");
-      onSwitchToLogin();
+      navigate('/login'); // Redirect to login route after success
     }
   };
 
@@ -124,7 +127,8 @@ const RegisterForm = ({ onSwitchToLogin }) => {
           <p className="text-gray-500 font-medium text-sm">
             Already have an account?{' '}
             <button 
-              onClick={onSwitchToLogin}
+              type="button"
+              onClick={() => navigate('/login')} // Updated to use navigate
               className="text-emerald-600 font-bold hover:underline"
             >
               Sign In

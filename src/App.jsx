@@ -38,11 +38,11 @@ function App() {
         {/* Auth Routes: Redirect to Dashboard if session exists */}
         <Route 
           path="/login" 
-          element={!session ? <LoginForm supabase={supabase} /> : <  to="/" />} 
+          element={!session ? <LoginForm supabase={supabase} /> : <Navigate to="/overview" />} 
         />
         <Route 
           path="/register" 
-          element={!session ? <RegisterForm /> : <Navigate to="/" />} 
+          element={!session ? <RegisterForm /> : <Navigate to="/overview" />} 
         />
 
         {/* Dashboard Routes: Catch-all path that handles sub-navigation */}
