@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
+
+// Page & Component Imports
 import Dashboard from './pages/Dashboard.jsx';
 import LoginForm from './components/LoginForm.jsx';
 import RegisterForm from './components/RegistrationForm.jsx';
 
 function App() {
   const [session, setSession] = useState(null);
-  const [authView, setAuthView] = useState('login');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,28 +27,31 @@ function App() {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut(); // Triggers the state change to null
+    await supabase.auth.signOut();
   };
 
-  if (loading) return null; // Prevents showing login form while checking session
-
-  if (session) {
-    return <Dashboard onLogout={handleLogout} user={session.user} />;
-  }
+  if (loading) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {authView === 'login' ? (
-        <LoginForm 
-          supabase={supabase} 
-          onSwitchToRegister={() => setAuthView('register')} 
+    <Router>
+      <Routes>
+        {/* Auth Routes: Redirect to Dashboard if session exists */}
+        <Route 
+          path="/login" 
+          element={!session ? <LoginForm supabase={supabase} /> : <  to="/" />} 
         />
-      ) : (
-        <RegisterForm 
-          onSwitchToLogin={() => setAuthView('login')} 
+        <Route 
+          path="/register" 
+          element={!session ? <RegisterForm /> : <Navigate to="/" />} 
         />
-      )}
-    </div>
+
+        {/* Dashboard Routes: Catch-all path that handles sub-navigation */}
+        <Route 
+          path="/*" 
+          element={session ? <Dashboard onLogout={handleLogout} user={session.user} /> : <Navigate to="/login" />} 
+        />
+      </Routes>
+    </Router>
   );
 }
 

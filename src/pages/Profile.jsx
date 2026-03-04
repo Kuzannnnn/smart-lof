@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { User, MapPin, ArrowLeft, Building2, Save, Edit2, Loader2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
-const Profile = ({ setCurrentView, user }) => {
+// ADD 'onProfileUpdate' TO YOUR PROPS
+const Profile = ({ setCurrentView, user, onProfileUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false); // separate loading state for the save button
+  const [saving, setSaving] = useState(false); 
   
   const [profileData, setProfileData] = useState({
     fullName: "",
@@ -13,7 +14,6 @@ const Profile = ({ setCurrentView, user }) => {
     address: ""
   });
 
-  // Fetch profile data on load
   useEffect(() => {
     const fetchProfile = async () => {
       const { data, error } = await supabase
@@ -47,6 +47,13 @@ const Profile = ({ setCurrentView, user }) => {
 
     if (!error) {
       setIsEditing(false);
+      
+      // THIS IS THE CRITICAL LINE: 
+      // It tells the Dashboard/Navbar to update the top right name immediately.
+      if (onProfileUpdate) {
+        onProfileUpdate(profileData.fullName);
+      }
+      
     } else {
       alert(error.message);
     }
@@ -58,7 +65,10 @@ const Profile = ({ setCurrentView, user }) => {
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-black text-gray-900">Profile Settings</h1>
+        <div>
+          <h1 className="text-3xl font-black text-gray-900">Profile Settings</h1>
+          <p className="text-gray-500 font-medium">Updating for: {profileData.fullName}</p>
+        </div>
         <button onClick={() => setCurrentView('overview')} className="flex items-center gap-2 text-emerald-600 font-bold bg-emerald-50 px-4 py-2 rounded-xl hover:bg-emerald-100 transition-colors">
           <ArrowLeft size={18} /> Back
         </button>
@@ -67,7 +77,6 @@ const Profile = ({ setCurrentView, user }) => {
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-10 space-y-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          {/* Full Name Field */}
           <div className={`p-6 rounded-3xl border transition-all ${isEditing ? 'bg-white border-emerald-500 ring-4 ring-emerald-50' : 'bg-gray-50 border-transparent'}`}>
             <div className="flex items-center gap-3 mb-2 text-emerald-600">
               <User size={20} />
@@ -85,7 +94,6 @@ const Profile = ({ setCurrentView, user }) => {
             )}
           </div>
 
-          {/* Company Name Field */}
           <div className={`p-6 rounded-3xl border transition-all ${isEditing ? 'bg-white border-emerald-500 ring-4 ring-emerald-50' : 'bg-gray-50 border-transparent'}`}>
             <div className="flex items-center gap-3 mb-2 text-emerald-600">
               <Building2 size={20} />
@@ -103,7 +111,6 @@ const Profile = ({ setCurrentView, user }) => {
             )}
           </div>
 
-          {/* Address Field (Spans full width) */}
           <div className={`md:col-span-2 p-6 rounded-3xl border transition-all ${isEditing ? 'bg-white border-emerald-500 ring-4 ring-emerald-50' : 'bg-gray-50 border-transparent'}`}>
             <div className="flex items-center gap-3 mb-2 text-emerald-600">
               <MapPin size={20} />
@@ -131,7 +138,7 @@ const Profile = ({ setCurrentView, user }) => {
           {saving ? (
             <Loader2 className="animate-spin" size={20} />
           ) : isEditing ? (
-            <><Save size={20} /> Save to Database</>
+            <><Save size={20} /> Update Database & Navbar</>
           ) : (
             <><Edit2 size={20} /> Edit Profile</>
           )}
